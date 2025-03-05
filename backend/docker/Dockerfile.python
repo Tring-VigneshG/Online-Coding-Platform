@@ -1,0 +1,4 @@
+FROM python:3.10
+WORKDIR /app
+COPY script.py /app
+CMD ["python", "script.py"]
