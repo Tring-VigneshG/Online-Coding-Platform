@@ -1,5 +1,3 @@
 FROM openjdk:17
-WORKDIR /app
-COPY Main.java /app
-RUN javac Main.java
-CMD ["java", "Main"]
+WORKDIR /code
+CMD ["sh", "-c", "javac Main.java && java Main"]
