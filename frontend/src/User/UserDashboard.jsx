@@ -1,7 +1,15 @@
 import React from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+
 const UserDashboard = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); 
+    navigate("/signin"); 
+  };
+
   return (
     <div className="d-flex vh-100">
       <div className="d-flex flex-column bg-dark text-white p-3" style={{ width: "250px" }}>
@@ -20,11 +28,18 @@ const UserDashboard = () => {
             Profile
           </Link>
         </nav>
+        <button
+          className="btn btn-danger mt-auto fw-semibold px-3 py-2"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
       </div>
-      <div className=" bg-light flex-grow-1 overflow-auto">
+      <div className="bg-light flex-grow-1 overflow-auto">
         <Outlet />
       </div>
     </div>
   );
 };
+
 export default UserDashboard;

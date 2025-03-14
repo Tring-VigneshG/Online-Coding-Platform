@@ -39,6 +39,12 @@ const SignIn = () => {
       setPasswordError(password.length !=0 ? null : "Password cannot be empty");
     }
   }, [email, password, touched]);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/dashboard"); 
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

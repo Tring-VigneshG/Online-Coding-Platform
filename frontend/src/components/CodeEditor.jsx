@@ -81,6 +81,7 @@ const CodeEditor = () => {
     });
 
     setTestResults(data.runCode);
+
     setRawOutput(data.runCode.map(tc => tc.actualOutput).join("\n"));
     setActiveTab("Test Cases");
     setAllTestsPassed(data.runCode.every(tc => tc.passed));
@@ -133,6 +134,28 @@ const CodeEditor = () => {
           {activeTab === "Constraints" && (
             <div dangerouslySetInnerHTML={{ __html: data.problem.problem_constraints }} />
           )}
+          {activeTab === "Test Cases" && (
+            <div className="p-3 rounded  text-light">
+              <h5 className="fw-bold text-warning">Test Case Results</h5>
+              {testResults.length > 0 ? (
+                testResults.map((test, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 mb-3 rounded shadow ${test.passed ? "bg-success text-light" : "bg-danger text-light"}`}
+                  >
+                    <h6 className="fw-bold">{test.passed ? "✅ Passed" : "Failed"}</h6>
+                    <p className="mb-1"><strong>📝 Input:</strong> <code className="bg-light text-dark p-1 rounded">{test.input}</code></p>
+                    <p className="mb-1"><strong>✅ Expected:</strong> <span className="text-warning">{test.expectedOutput}</span></p>
+                    <p className="mb-1"><strong>🔴 Actual:</strong> <span className="fw-bold">{test.actualOutput}</span></p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-light text-center fw-bold">No test cases executed yet.</p>
+              )}
+            </div>
+          )}
+
+
           {activeTab === "Submission History" && submissionsData && (
             <div className="bg-secondary p-3 rounded">
               {submissionsData.submissions.map(sub => (
@@ -147,7 +170,7 @@ const CodeEditor = () => {
           )}
         </div>
       </div>
-      
+
       <div className="col-8 d-flex flex-column p-4 bg-dark text-light">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h2 className="text-warning">Code Editor</h2>
@@ -158,7 +181,7 @@ const CodeEditor = () => {
         </div>
 
         <Editor height="50vh" language={language} value={code} onChange={setCode} theme="vs-dark" />
-      
+
         <button onClick={runCode} className="btn btn-warning w-100 fw-bold mt-3" disabled={runLoading}>
           {runLoading ? "Running..." : "Run Code"}
         </button>

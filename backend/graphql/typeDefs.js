@@ -62,6 +62,7 @@ const typeDefs = gql`
 
 
 
+
   type Mutation {
     signup(name:String!,email:String!,password:String!):Auth
     signin(email:String!,password:String!):Auth
@@ -74,6 +75,17 @@ const typeDefs = gql`
       solutionCode: String!,
       difficulty:String!,
       solutionLanguage: String!,
+      testCases: [TestCaseInput!]!
+    ): Problem
+    updateProblem(
+      id: ID!
+      title: String!
+      description: String!
+      examples: String!
+      constraints: String!
+      difficulty: String!
+      solutionCode: String!
+      solutionLanguage: String!
       testCases: [TestCaseInput!]!
     ): Problem
     deleteProblem(id: ID!): DeleteResponse!

@@ -4,7 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import Editor from "@monaco-editor/react";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const GET_PROBLEM = gql`
   query GetProblem($id: ID!) {
     problem(id: $id) {
@@ -56,7 +57,7 @@ const UPDATE_PROBLEM = gql`
 const EditProblem = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { loading, error, data } = useQuery(GET_PROBLEM, { variables: { id } });
+  const { loading, error, data } = useQuery(GET_PROBLEM, { variables: { id },fetchPolicy:"network-only" });
   const [updateProblem] = useMutation(UPDATE_PROBLEM);
 
   const [title, setTitle] = useState("");
@@ -84,14 +85,29 @@ const EditProblem = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    const hasValidTestCase = testCases.some(tc => tc.input.trim() !== "" && tc.expected_output.trim() !== "");
+
+    if (!hasValidTestCase) {
+      toast.error("At least one test case must have an input and an expected output!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    const sanitizedTestCases = testCases.map(({ __typename, ...rest }) => rest);
+    
     try {
       await updateProblem({
-        variables: { id, title, description, examples, constraints, solutionCode, difficulty, solutionLanguage, testCases },
+        variables: { id, title, description, examples, constraints, solutionCode, difficulty, solutionLanguage, testCases:sanitizedTestCases },
       });
-      alert("Problem Updated Successfully!");
-      navigate("/dashboard");
+      toast.success("Problem Updated Successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      navigate("/dashboard/my-problems");
     } catch (err) {
-      console.error("Update failed", err);
+      console.log("Update failed", err);
     }
   };
 

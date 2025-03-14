@@ -34,17 +34,12 @@ const ProblemList = () => {
   if (error) return <p className="text-danger">Error: {error.message}</p>;
 
   const solvedProblemIds = new Set(
-    submissionsData?.submissions
-      ?.filter((sub) => sub.status === "Accepted")
-      .map((sub) => sub.problemId)
+    submissionsData?.submissions?.filter(sub => sub.status === "Accepted").map(sub => sub.problemId)
   );
 
- 
-  const filteredProblems = data.problems
-    .filter((problem) => (filter === "Solved" ? solvedProblemIds.has(problem.id) : !solvedProblemIds.has(problem.id)))
-    .filter((problem) => problem.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  const searchedProblems = data.problems.filter(problem => problem.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
- 
+  const filteredProblems = searchedProblems;
   const totalPages = Math.ceil(filteredProblems.length / problemsPerPage);
   const startIndex = (currentPage - 1) * problemsPerPage;
   const paginatedProblems = filteredProblems.slice(startIndex, startIndex + problemsPerPage);
@@ -53,17 +48,18 @@ const ProblemList = () => {
     <div className="container">
       <h2 className="mb-4 text-warning">Problems</h2>
 
-      
       <input
         type="text"
         className="form-control mb-3"
         placeholder="Search problems..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1);
+        }}
       />
 
-     
-      <div className="mb-3">
+      {/* <div className="mb-3">
         <button
           className={`btn ${filter === "Unsolved" ? "btn-warning" : "btn-outline-warning"} me-2`}
           onClick={() => setFilter("Unsolved")}
@@ -76,9 +72,8 @@ const ProblemList = () => {
         >
           Solved Problems
         </button>
-      </div>
+      </div> */}
 
-    
       <div className="p-4 list-group">
         {paginatedProblems.length > 0 ? (
           paginatedProblems.map((problem) => (

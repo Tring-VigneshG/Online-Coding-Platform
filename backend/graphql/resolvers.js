@@ -47,6 +47,7 @@ const resolvers = {
       );
       return rows;
     },
+    
   },
   Mutation: {
     addProblem: async (_, input, { token }) => {
@@ -108,6 +109,37 @@ const resolvers = {
         client.release();
       }
     },
+    updateProblem: async (_, problem) => {
+      try {
+       const { id, title, description, examples, constraints, difficulty, solutionCode, solutionLanguage, testCases }=problem;
+       console.log(problem)
+        await query(
+          `UPDATE problems SET title=$1, description=$2, examples=$3, problem_constraints=$4, difficulty=$5, solution_code=$6, solution_language=$7 WHERE id=$8`,
+          [title, description, examples, constraints, difficulty, solutionCode, solutionLanguage, id]
+        );
+
+       console.log("done")
+        await query(`DELETE FROM test_cases WHERE problem_id=$1`, [id]);
+        for (const testCase of testCases) {
+          await query(
+            `INSERT INTO test_cases (problem_id, input, expected_output) VALUES ($1, $2, $3)`,
+            [id, testCase.input, testCase.expected_output]
+          );
+        }
+
+  
+        const updatedProblem = await query(`SELECT * FROM problems WHERE id=$1`, [id]);
+        const updatedTestCases = await query(`SELECT * FROM test_cases WHERE problem_id=$1`, [id]);
+
+        return {
+          ...updatedProblem.rows[0],
+          testCases: updatedTestCases.rows,
+        };
+      } catch (error) {
+        console.log(error);
+        throw new Error('Failed to update problem',error);
+      }
+    },
 
     signup: async (_, account) => {
       const { name, email, password } = account;
@@ -116,7 +148,6 @@ const resolvers = {
         throw new Error("Email already exists");
       }
       const hashedPassword = await hashPassword(password);
-
       const newUser = await query(
         "INSERT INTO users(name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
         [name, email, hashedPassword]
